@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+{% block title %}{{ quiz.book_title }} — Worksheet{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* ---------- Screen styles ---------- */
+  .worksheet { padding: 1.25rem; }
+
+  .q-card {
+    background: #fffaf0;
+    border: 1.5px solid var(--rule);
+    border-radius: 16px;
+    padding: 1.5rem 1.75rem 1.75rem;
+    margin-bottom: 1.25rem;
+  }
+  .q-number {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 2rem; height: 2rem; border-radius: 999px;
+    background: var(--teal); color: #fff;
+    font-family: 'Fraunces', serif; font-weight: 700;
+    margin-right: 0.6rem;
+  }
+  .q-text {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 1.25rem;
+    line-height: 1.45;
+    color: var(--ink);
+  }
+
+  .write-lines { margin-top: 1rem; }
+  .write-line {
+    border-bottom: 1.5px solid var(--rule);
+    height: 2.4rem;
+  }
+  .write-line + .write-line { margin-top: 0.15rem; }
+
+  .draw-card {
+    background: #fffaf0;
+    border: 2.5px dashed var(--coral);
+    border-radius: 18px;
+    padding: 1.5rem 1.75rem;
+    margin-top: 1.5rem;
+  }
+  .draw-card .q-number { background: var(--coral); }
+  .draw-box {
+    margin-top: 1rem;
+    height: 22rem;
+    border: 1.5px dashed var(--rule);
+    border-radius: 12px;
+    background:
+      repeating-linear-gradient(45deg,
+        transparent 0, transparent 18px,
+        rgba(216,205,177,0.18) 18px, rgba(216,205,177,0.18) 19px);
+  }
+
+  /* ---------- Print styles ---------- */
+  @media print {
+    /* Force clean black-on-white. */
+    html, body {
+      background: #fff !important;
+      color: #000 !important;
+      font-family: 'Nunito', sans-serif;
+    }
+    body::before { display: none !important; }
+
+    /* Hide all app chrome. */
+    nav, footer, .print\:hidden, .no-print { display: none !important; }
+
+    /* Edge-to-edge page; let @page handle margins. */
+    main { max-width: none !important; padding: 0 !important; margin: 0 !important; }
+    .worksheet { padding: 0 !important; }
+
+    @page { margin: 0.6in 0.7in; }
+
+    /* Cards become flat sections; no shadows, no fills. */
+    .q-card, .draw-card {
+      background: #fff !important;
+      border: 1px solid #000 !important;
+      box-shadow: none !important;
+      border-radius: 8px;
+      padding: 0.9rem 1rem 1.1rem;
+      margin-bottom: 0.9rem;
+      /* Don't split a question across pages. */
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .draw-card {
+      border: 1.5px dashed #000 !important;
+      page-break-before: auto;
+    }
+    .q-number {
+      background: #000 !important;
+      color: #fff !important;
+      box-shadow: none !important;
+    }
+    .q-text { color: #000 !important; font-size: 13pt; }
+    .write-line { border-bottom: 1px solid #444; height: 0.55in; }
+    .draw-box {
+      border: 1px dashed #555 !important;
+      background: #fff !important;
+      height: 5.2in;
+    }
+
+    /* Worksheet header tightens. */
+    .ws-header {
+      border-bottom: 1px solid #000 !important;
+      padding-bottom: 0.4rem !important;
+      margin-bottom: 0.9rem !important;
+    }
+    .ws-header h1 { color: #000 !important; }
+
+    a { color: #000 !important; text-decoration: none !important; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+  <!-- Top action bar (screen only) -->
+  <div class="print:hidden flex items-center justify-between mb-6">
+    <a href="{{ url_for('index') }}" class="btn btn-ghost">
+      ← Back to library
+    </a>
+    <button onclick="window.print()" class="btn btn-primary">
+      🖨️&nbsp; Print worksheet
+    </button>
+  </div>
+
+  <article class="worksheet card sm:p-8 print:p-0 print:border-0 print:shadow-none">
+
+    <header class="ws-header mb-6 print:mb-3">
+      <p class="text-xs uppercase tracking-[0.2em] text-[color:var(--coral)] font-bold mb-2 print:text-black">
+        Reading Adventure
+      </p>
+      <h1 class="font-display text-3xl sm:text-4xl font-bold leading-tight text-[color:var(--teal-deep)]">
+        {{ quiz.book_title }}
+      </h1>
+      <div class="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-sm text-[color:var(--ink-soft)]">
+        <span><strong class="font-bold">Name:</strong>
+          <span class="inline-block border-b border-[color:var(--rule)] min-w-[10rem] print:min-w-[2in]">&nbsp;</span>
+        </span>
+        <span><strong class="font-bold">Date:</strong>
+          <span class="inline-block border-b border-[color:var(--rule)] min-w-[7rem] print:min-w-[1.5in]">&nbsp;</span>
+        </span>
+      </div>
+      <p class="mt-3 italic text-[color:var(--ink-soft)] print:text-black text-sm">
+        There are no wrong answers here — just your thoughts. Take your time.
+      </p>
+    </header>
+
+    {% set qs = quiz.questions %}
+    {% for question in qs[:5] %}
+      <section class="q-card">
+        <div class="q-text">
+          <span class="q-number">{{ loop.index }}</span>{{ question }}
+        </div>
+        <div class="write-lines">
+          <div class="write-line"></div>
+          <div class="write-line"></div>
+          <div class="write-line"></div>
+          <div class="write-line"></div>
+          <div class="write-line"></div>
+        </div>
+      </section>
+    {% endfor %}
+
+    {% if qs|length >= 6 %}
+      <section class="draw-card">
+        <div class="q-text">
+          <span class="q-number">✏️</span>{{ qs[5] }}
+        </div>
+        <div class="draw-box"></div>
+      </section>
+    {% endif %}
+
+  </article>
+
+  <!-- Bottom action bar (screen only) -->
+  <div class="print:hidden flex items-center justify-between mt-6">
+    <a href="{{ url_for('index') }}" class="btn btn-ghost">
+      ← Back to library
+    </a>
+    <button onclick="window.print()" class="btn btn-primary">
+      🖨️&nbsp; Print worksheet
+    </button>
+  </div>
+{% endblock %}

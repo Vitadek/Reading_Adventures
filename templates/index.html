@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Your Library — Reading Adventures{% endblock %}
+
+{% block content %}
+  <section class="mb-12">
+    <h1 class="font-display text-4xl sm:text-5xl font-bold leading-tight mb-3">
+      Turn any storybook into a worksheet.
+    </h1>
+    <p class="text-[color:var(--ink-soft)] text-lg max-w-2xl">
+      Upload an EPUB and we'll create six gentle, open-ended questions —
+      no yes/no, no trivia, no right answers. Just curiosity.
+    </p>
+  </section>
+
+  <section class="card p-6 sm:p-8 mb-12">
+    <h2 class="font-display text-2xl font-bold mb-4 text-[color:var(--teal-deep)]">
+      Add a new book
+    </h2>
+    <form method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data"
+          class="flex flex-col sm:flex-row gap-3 sm:items-center">
+      <label class="flex-1 cursor-pointer">
+        <input type="file" name="file" accept=".epub,.pdf,.docx" required
+               class="block w-full text-sm text-[color:var(--ink)]
+                      file:mr-4 file:py-2 file:px-4
+                      file:rounded-full file:border-0
+                      file:text-sm file:font-bold
+                      file:bg-[color:var(--coral-soft)] file:text-[color:var(--coral)]
+                      hover:file:bg-[color:var(--coral)] hover:file:text-white
+                      file:transition file:cursor-pointer">
+      </label>
+      <button type="submit" class="btn btn-primary justify-center">
+        Upload book
+      </button>
+    </form>
+    <p class="text-xs text-[color:var(--ink-soft)] mt-3">
+      EPUB, PDF, or DOCX — up to 50&nbsp;MB. (Scanned PDFs without text won't work.)
+    </p>
+  </section>
+
+  <section>
+    <div class="flex items-baseline justify-between mb-4">
+      <h2 class="font-display text-2xl font-bold text-[color:var(--teal-deep)]">
+        Your library
+      </h2>
+      <span class="text-sm text-[color:var(--ink-soft)]">
+        {{ books|length }} book{{ '' if books|length == 1 else 's' }}
+      </span>
+    </div>
+
+    {% if not books %}
+      <div class="card p-8 text-center text-[color:var(--ink-soft)]">
+        <p class="font-display text-xl mb-1">Your shelf is empty.</p>
+        <p class="text-sm">Upload your first EPUB above to get started.</p>
+      </div>
+    {% else %}
+      <ul class="space-y-3">
+        {% for book in books %}
+          <li class="card p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+            <div class="flex-1 min-w-0">
+              <h3 class="font-display text-xl font-bold truncate">
+                {{ book.title }}
+              </h3>
+              <p class="text-xs text-[color:var(--ink-soft)] mt-1">
+                Added {{ book.uploaded_at.strftime('%b %d, %Y') }}
+                · {{ book.quiz_count }} quiz{{ '' if book.quiz_count == 1 else 'zes' }} so far
+              </p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              {% if book.latest_quiz_id %}
+                <a href="{{ url_for('view_quiz', quiz_id=book.latest_quiz_id) }}"
+                   class="btn btn-ghost">
+                  View latest
+                </a>
+              {% endif %}
+              <form method="POST" action="{{ url_for('generate', book_id=book.id) }}"
+                    onsubmit="
+                      var b=this.querySelector('button');
+                      b.disabled=true;
+                      b.innerHTML='Generating&hellip; ✨';
+                    ">
+                <button type="submit" class="btn btn-coral">
+                  Generate quiz
+                </button>
+              </form>
+              <form method="POST" action="{{ url_for('delete_book', book_id=book.id) }}"
+                    onsubmit="return confirm('Delete &quot;{{ book.title|e }}&quot; and all of its worksheets? This cannot be undone.');"
+                    class="ml-1">
+                <button type="submit"
+                        class="text-xs font-semibold text-[color:var(--ink-soft)] hover:text-rose-700 hover:underline px-2 py-2 transition"
+                        title="Delete this book and its worksheets">
+                  Delete
+                </button>
+              </form>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </section>
+{% endblock %}

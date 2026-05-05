@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Reading Adventures{% endblock %}</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,500&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-cream:    #faf3e7;
+      --bg-cream-2:  #f3e9d2;
+      --ink:         #2b2a26;
+      --ink-soft:    #5b574d;
+      --teal:        #1f6f6b;
+      --teal-deep:   #154f4c;
+      --coral:       #d96f4e;
+      --coral-soft:  #f1c2af;
+      --rule:        #d8cdb1;
+    }
+    html, body { font-family: 'Nunito', system-ui, sans-serif; color: var(--ink); }
+    body { background: var(--bg-cream); }
+    .font-display { font-family: 'Fraunces', Georgia, serif; font-optical-sizing: auto; }
+
+    /* Subtle paper grain on the page */
+    body::before {
+      content: "";
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background-image:
+        radial-gradient(circle at 20% 10%, rgba(217,111,78,0.06), transparent 40%),
+        radial-gradient(circle at 80% 90%, rgba(31,111,107,0.06), transparent 40%);
+    }
+    main, nav, footer { position: relative; z-index: 1; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.6rem 1.1rem; border-radius: 999px;
+      font-weight: 700; letter-spacing: 0.01em;
+      transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+    }
+    .btn-primary { background: var(--teal); color: #fff; box-shadow: 0 2px 0 var(--teal-deep); }
+    .btn-primary:hover { transform: translateY(-1px); background: var(--teal-deep); }
+    .btn-primary:disabled { opacity: 0.65; cursor: wait; transform: none; }
+    .btn-coral { background: var(--coral); color: #fff; box-shadow: 0 2px 0 #b3522f; }
+    .btn-coral:hover { transform: translateY(-1px); background: #c25c3d; }
+    .btn-ghost { background: transparent; color: var(--teal-deep); border: 1.5px solid var(--teal); }
+    .btn-ghost:hover { background: rgba(31,111,107,0.08); }
+
+    .card {
+      background: #fffaf0;
+      border: 1.5px solid var(--rule);
+      border-radius: 18px;
+      box-shadow: 0 1px 0 rgba(0,0,0,0.02), 0 8px 24px -12px rgba(43,42,38,0.15);
+    }
+  </style>
+
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="min-h-screen">
+
+  <nav class="print:hidden border-b border-[color:var(--rule)] bg-[color:var(--bg-cream-2)]/60 backdrop-blur">
+    <div class="max-w-4xl mx-auto px-5 py-4 flex items-center justify-between">
+      <a href="{{ url_for('index') }}" class="font-display text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--teal-deep)]">
+        Reading&nbsp;Adventures
+      </a>
+      <span class="hidden sm:inline text-sm text-[color:var(--ink-soft)] italic">
+        Worksheets for curious little readers
+      </span>
+    </div>
+  </nav>
+
+  <main class="max-w-4xl mx-auto px-5 py-10">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="mb-8 print:hidden space-y-2">
+          {% for category, msg in messages %}
+            <div class="px-4 py-3 rounded-xl border
+                        {% if category == 'error' %}
+                          bg-rose-50 border-rose-200 text-rose-800
+                        {% else %}
+                          bg-emerald-50 border-emerald-200 text-emerald-800
+                        {% endif %}">
+              {{ msg }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="print:hidden text-center text-sm text-[color:var(--ink-soft)] py-10">
+    <span class="font-display italic">Made with care for little readers.</span>
+  </footer>
+
+</body>
+</html>

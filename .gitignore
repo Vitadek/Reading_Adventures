@@ -1,0 +1,49 @@
+# --- Secrets ---
+# Never commit your real .env. Keep .env.example tracked as the template.
+.env
+.env.local
+.env.*.local
+
+# --- User content / runtime data ---
+# Uploaded books may be copyrighted — never commit them.
+uploads/
+# Local Postgres data, if you ever switch from a named volume to a bind mount.
+postgres_data/
+# DB dumps from the backup routine in the README.
+*.sql
+!init.sql
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- Virtual environments ---
+.venv/
+venv/
+env/
+ENV/
+
+# --- Editor / IDE ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# --- OS noise ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Logs ---
+*.log
+logs/
+
+# --- Release artifacts ---
+*.tar.gz
+*.zip
